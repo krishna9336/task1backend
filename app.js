@@ -1,59 +1,62 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import { User } from './model/user.js';
-import {config} from "dotenv"
-import ErrorHandler from './Middleware/error.js';
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import { User } from "./model/user.js";
+import { config } from "dotenv";
 
-
- export const app = express();
-
+export const app = express();
 
 config({
-    path:"./data/config.env"
-})
+  path: "./data/config.env",
+});
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
 // Routes
-app.post('/api/users', async (req, res,next) => {
+app.post("/api/users", async (req, res, next) => {
   try {
     const newUser = new User(req.body);
-    if(newUser) return next(new ErrorHandler("User already Exist",400))
+    console.log(newUser);
     const savedUser = await newUser.save();
     res.json({
-        message:"User Created",
-        savedUser});
+      message: "User Created",
+      savedUser,
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
 });
 
-app.get('/api/users/all', async (req,res,next)=>{
-  try{
-  const users = await User.find();
+app.get("/api/users/all", async (req, res, next) => {
+  try {
+    const users = await User.find();
     res.json(users);
   } catch (error) {
-    next(error)  }
+    next(error);
+  }
 });
 
-app.put('/api/users/:id', async (req, res,next) => {
+app.put("/api/users/:id", async (req, res, next) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     res.json({
-        message:"Updated User Details",
-        updatedUser});
+      message: "Updated User Details",
+      updatedUser,
+    });
   } catch (error) {
-    next(error)  }
+    next(error);
+  }
 });
 
-app.delete('/api/users/:id', async (req, res,next) => {
+app.delete("/api/users/:id", async (req, res, next) => {
+  console.log("param passed=>", req.params.id);
   try {
     await User.findByIdAndRemove(req.params.id);
-    res.json({ message: 'User deleted' });
+    res.json({ message: "User deleted" });
   } catch (error) {
-    next(error)  }
+    next(error);
+  }
 });
-
-
